@@ -16,7 +16,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+
 
   battery_info_example:
     # When depending on this package from a real application you should use:
@@ -30,6 +30,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   dart_flutter_version: ^1.0.23
+
+  # State management
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   integration_test:
