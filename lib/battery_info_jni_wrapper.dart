@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io' show Platform;
 
 import 'package:jni/jni.dart';
 import 'src/generated/battery_info_jni.dart';
@@ -11,7 +12,7 @@ import 'src/generated/battery_info_jni.dart';
 /// Usage:
 /// ```dart
 /// final batteryInfo = BatteryInfoJniWrapper();
-/// final level = batteryInfo.getBatteryLevel();
+/// final level = await batteryInfo.getBatteryLevel();
 /// print('Battery: $level%');
 /// batteryInfo.dispose(); // Clean up JNI resources
 /// ```
@@ -21,15 +22,12 @@ class BatteryInfoJniWrapper {
   /// Lazy initialization - creates the JNI instance on first use
   BatteryInfoJni get _instance {
     if (_jniInstance == null) {
-      // Get the Android application context
-      // The activity itself is a Context, so we can use it directly
-      final activity = Jni.getCurrentActivity();
+      // Create the BatteryInfoJni instance
+      _jniInstance = BatteryInfoJni();
 
-      // Convert JReference to JObject to pass to BatteryInfoJni constructor
-      final activityObject = JObject.fromReference(activity);
-
-      // Create the BatteryInfoJni instance with the activity context
-      _jniInstance = BatteryInfoJni(activityObject);
+      // Get the Android application context and set it
+      final context = Jni.androidApplicationContext;
+      _jniInstance!.setContext(context);
     }
     return _jniInstance!;
   }
@@ -41,6 +39,10 @@ class BatteryInfoJniWrapper {
   ///
   /// Returns -1 if battery level is unavailable.
   int getBatteryLevel() {
+    if (!Platform.isAndroid) {
+      return -1; // JNI only available on Android
+    }
+
     try {
       return _instance.getBatteryLevel();
     } catch (e) {
@@ -53,6 +55,10 @@ class BatteryInfoJniWrapper {
   ///
   /// Returns true if the device is currently charging, false otherwise.
   bool isCharging() {
+    if (!Platform.isAndroid) {
+      return false; // JNI only available on Android
+    }
+
     try {
       return _instance.isCharging();
     } catch (e) {
@@ -65,6 +71,10 @@ class BatteryInfoJniWrapper {
   ///
   /// Returns the temperature value or -1 if unavailable.
   int getTemperature() {
+    if (!Platform.isAndroid) {
+      return -1; // JNI only available on Android
+    }
+
     try {
       return _instance.getTemperature();
     } catch (e) {
